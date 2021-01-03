@@ -1,4 +1,4 @@
-package akkastreamsprimer
+package akkastreamsprimer.util
 
 import akka.actor.ActorSystem
 import akka.stream.Materializer

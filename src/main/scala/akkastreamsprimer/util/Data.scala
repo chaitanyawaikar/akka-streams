@@ -1,4 +1,4 @@
-package akkastreamsprimer
+package akkastreamsprimer.util
 
 object Data {
 

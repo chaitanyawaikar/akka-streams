@@ -5,7 +5,8 @@ import akka.stream.scaladsl.{Flow, Sink, Source}
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
-import Data._
+import akkastreamsprimer.util.Data._
+import akkastreamsprimer.util.SystemSetup
 
 object MaterializingStreams extends SystemSetup with App {
 
