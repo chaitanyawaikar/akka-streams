@@ -1,7 +1,7 @@
-package akkastreamsprimer
+package akkastreams.primer
 
 import akka.stream.scaladsl.{Sink, Source}
-import akkastreamsprimer.util.SystemSetup
+import akkastreams.util.SystemSetup
 
 object OperatorFusion extends SystemSetup with App {
 

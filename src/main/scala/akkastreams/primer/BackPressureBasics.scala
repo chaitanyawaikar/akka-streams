@@ -1,8 +1,8 @@
-package akkastreamsprimer
+package akkastreams.primer
 
 import akka.stream.OverflowStrategy
 import akka.stream.scaladsl.{Flow, Sink, Source}
-import akkastreamsprimer.util.SystemSetup
+import akkastreams.util.SystemSetup
 
 object BackPressureBasics extends SystemSetup with App {
 

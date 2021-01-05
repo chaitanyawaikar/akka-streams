@@ -1,8 +1,8 @@
-package akkastreamsprimer
+package akkastreams.primer
 
 import akka.Done
 import akka.stream.scaladsl.{Flow, Sink, Source}
-import akkastreamsprimer.util.SystemSetup
+import akkastreams.util.SystemSetup
 
 import scala.concurrent.Future
 

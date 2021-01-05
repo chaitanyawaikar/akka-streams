@@ -1,12 +1,12 @@
-package akkastreamsprimer
+package akkastreams.primer
 
 import akka.NotUsed
 import akka.stream.scaladsl.{Flow, Sink, Source}
+import akkastreams.util.Data.{numbersRange, sentences}
+import akkastreams.util.SystemSetup
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
-import akkastreamsprimer.util.Data._
-import akkastreamsprimer.util.SystemSetup
 
 object MaterializingStreams extends SystemSetup with App {
 
