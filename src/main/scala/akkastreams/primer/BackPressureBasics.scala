@@ -3,6 +3,7 @@ package akkastreams.primer
 import akka.stream.OverflowStrategy
 import akka.stream.scaladsl.{Flow, Sink, Source}
 import akkastreams.util.SystemSetup
+import scala.language.postfixOps
 
 object BackPressureBasics extends SystemSetup with App {
 
