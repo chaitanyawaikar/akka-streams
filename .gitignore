@@ -9,6 +9,7 @@ project/plugins/project/
 .lib/
 .idea/
 .bsp/
+*.env
 
 ### Scala ###
 *.class

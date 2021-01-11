@@ -4,6 +4,7 @@ import akka.NotUsed
 import akka.stream.ClosedShape
 import akka.stream.scaladsl._
 import akkastreams.util.SystemSetup
+import scala.language.postfixOps
 
 object GraphBasics extends SystemSetup with App {
 

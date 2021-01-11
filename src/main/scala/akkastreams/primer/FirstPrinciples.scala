@@ -30,8 +30,6 @@ object FirstPrinciples extends SystemSetup with App {
   val finiteSource2 = Source.single(List(1, 2, 3, 4, 5, 6))
   val emptySource = Source.empty[Int]
   val infiniteSource = Source(LazyList.from(1))
-  // Source from future
-  val futureSource = Source.future(Future.successful(1))
 
   // Types of Sink
   val sinkThatDiscardsElements = Sink.ignore
