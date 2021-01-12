@@ -3,33 +3,37 @@ package fileuploader.service
 import java.io.File
 import java.time.OffsetDateTime
 
-import akka.Done
-import fileuploader.gateway.sns.SNSPublisher
+import fileuploader.gateway.{SNSClient, SqsClient}
 import fileuploader.models.{Event, FileType, FileUpload, Folder, File => CustomFile}
 import play.api.libs.json.Json
+import software.amazon.awssdk.services.sqs.model.Message
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class FileUploaderService(
-                           snsPublisher: SNSPublisher
+                           snsPublisher: SNSClient,
+                           sqsClient: SqsClient
                          )(implicit val executionContext: ExecutionContext) {
 
-  def uploadFiles(filePath: String): Future[List[Done]] = {
-    Future.sequence(
-      getInternalFiles(filePath)
-        .map(convertToFileEvent)
-        .map(x => Json.toJson(x).toString())
-        .map(snsPublisher.publishMessage)
-    )
+  def uploadFiles(filePath: String): Future[Seq[Message]] = {
+    for {
+      _ <- Future.sequence(
+        getInternalFiles(filePath)
+          .map(snsPublisher.publishMessage)
+      )
+      messagesFromSqs <- sqsClient.pollMessages()
+    } yield messagesFromSqs
   }
 
-  private def getInternalFiles(filePath: String): List[File] = {
+  private def getInternalFiles(filePath: String): List[String] = {
     val directory = new File(filePath)
     val files = if (directory.exists() && directory.isDirectory) {
       directory.listFiles().toList.filter(_.isFile)
     } else List[File]()
-    println(s"File count ${files.size}")
+
     files
+      .map(convertToFileEvent)
+      .map(x => Json.toJson(x).toString())
   }
 
   private def convertToFileEvent(file: File): Event = {

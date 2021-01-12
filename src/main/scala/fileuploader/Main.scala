@@ -1,24 +1,21 @@
 package fileuploader
 
-import akka.actor.ActorSystem
-import com.typesafe.config.{Config, ConfigFactory}
-import fileuploader.gateway.sns.SNSPublisher
+import fileuploader.gateway.{SNSClient, SqsClient}
 import fileuploader.service.FileUploaderService
 
 import scala.util.{Failure, Success}
 
 object Main extends App {
 
-  implicit val actorSystem: ActorSystem = ActorSystem("file-uploader")
-  implicit val systemEnv: Config = ConfigFactory.systemEnvironment()
-
   import scala.concurrent.ExecutionContext.Implicits.global
 
-  private lazy val snsPublisher = new SNSPublisher()
-  private lazy val fileUploaderService = new FileUploaderService(snsPublisher)
+  private lazy val snsPublisher = new SNSClient()
+  private lazy val sqsClient = new SqsClient()
+  private lazy val fileUploaderService = new FileUploaderService(snsPublisher, sqsClient)
+  private lazy val filePath = "/Users/chaitanyawaikar/Desktop"
 
-  fileUploaderService.uploadFiles("/Users/chaitanyawaikar/Desktop") onComplete {
-    case Success(_) => println("All events fired to SNS")
+  fileUploaderService.uploadFiles(filePath) onComplete {
+    case Success(messages) => println(s"All messages from SQS ${messages.foreach(println)}")
     case Failure(ex) => println(s"Failed with exception $ex")
   }
 }
