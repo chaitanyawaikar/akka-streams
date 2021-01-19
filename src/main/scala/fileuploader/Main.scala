@@ -1,9 +1,8 @@
 package fileuploader
 
+import fileuploader.gateway.AWSUtils._
 import fileuploader.gateway.{SNSClient, SqsClient}
 import fileuploader.service.FileUploaderService
-
-import scala.util.{Failure, Success}
 
 object Main extends App {
 
@@ -12,10 +11,10 @@ object Main extends App {
   private lazy val snsPublisher = new SNSClient()
   private lazy val sqsClient = new SqsClient()
   private lazy val fileUploaderService = new FileUploaderService(snsPublisher, sqsClient)
-  private lazy val filePath = "/Users/chaitanyawaikar/Desktop"
+  private lazy val filePath = config.getString("service.filePath")
 
-  fileUploaderService.uploadFiles(filePath) onComplete {
-    case Success(messages) => println(s"All messages from SQS ${messages.foreach(println)}")
-    case Failure(ex) => println(s"Failed with exception $ex")
-  }
+  for {
+    _ <- fileUploaderService.uploadFiles(filePath)
+    _ <- sqsClient.pollMessages()
+  } yield ()
 }

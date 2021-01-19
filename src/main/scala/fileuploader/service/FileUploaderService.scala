@@ -6,7 +6,6 @@ import java.time.OffsetDateTime
 import fileuploader.gateway.{SNSClient, SqsClient}
 import fileuploader.models.{Event, FileType, FileUpload, Folder, File => CustomFile}
 import play.api.libs.json.Json
-import software.amazon.awssdk.services.sqs.model.Message
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -15,14 +14,13 @@ class FileUploaderService(
                            sqsClient: SqsClient
                          )(implicit val executionContext: ExecutionContext) {
 
-  def uploadFiles(filePath: String): Future[Seq[Message]] = {
+  def uploadFiles(filePath: String): Future[Unit] = {
     for {
       _ <- Future.sequence(
         getInternalFiles(filePath)
           .map(snsPublisher.publishMessage)
       )
-      messagesFromSqs <- sqsClient.pollMessages()
-    } yield messagesFromSqs
+    } yield ()
   }
 
   private def getInternalFiles(filePath: String): List[String] = {
