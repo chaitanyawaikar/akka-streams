@@ -1,13 +1,16 @@
 package fileuploader.gateway
 
 import akka.NotUsed
+import akka.actor.ActorSystem
 import akka.stream.alpakka.sqs.scaladsl.SqsSource
 import akka.stream.alpakka.sqs.{MessageAction, SqsSourceSettings}
 import akka.stream.scaladsl.{Flow, RestartSource, Sink, Source}
 import akka.stream.{ActorAttributes, Supervision}
-import fileuploader.gateway.AWSUtils._
 import fileuploader.models.Event
 import play.api.libs.json.Json
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider
+import software.amazon.awssdk.core.client.config.ClientOverrideConfiguration
+import software.amazon.awssdk.http.async.SdkAsyncHttpClient
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.sqs.SqsAsyncClient
 import software.amazon.awssdk.services.sqs.model.Message
@@ -17,7 +20,10 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-class SqsClient() {
+class SqsClient(sqsTopicArn: String,
+                httpClient: SdkAsyncHttpClient,
+                credentialsProvider: StaticCredentialsProvider,
+                overrideConfig: ClientOverrideConfiguration)(implicit actorSystem: ActorSystem) {
 
   implicit val sqsClient: SqsAsyncClient =
     SqsAsyncClient
@@ -28,7 +34,7 @@ class SqsClient() {
       .overrideConfiguration(overrideConfig)
       .build()
 
-  def pollMessages(): Future[Unit] =  {
+  def pollMessages(): Future[Unit] = {
     for {
       _ <-
         getSource
@@ -37,7 +43,7 @@ class SqsClient() {
     } yield ()
   }
 
-  private def getSource: Source[Message, NotUsed] = {
+  private[gateway] def getSource: Source[Message, NotUsed] = {
     val supervisionStrategy: Supervision.Decider = Supervision.stoppingDecider
     val sourceSettings = SqsSourceSettings()
       .withWaitTime(10 seconds)
@@ -55,7 +61,7 @@ class SqsClient() {
     )(() => sqsSource)
   }
 
-  private def getFlow: Flow[Message, Unit, NotUsed] = {
+  private[gateway] def getFlow: Flow[Message, Unit, NotUsed] = {
 
     def processMessage(message: Message): Future[Event] = {
       val event = Json.parse(message.body()).as[Event]
