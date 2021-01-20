@@ -24,7 +24,7 @@ object AWSUtils {
     )
   lazy val config: Config = ConfigFactory.load()
   lazy val snsTopicArn: String = config.getString("aws.sns-arn")
-  lazy val sqsTopicArn: String = config.getString("aws.sqs-arn")
+  lazy val sqsTopicUrl: String = config.getString("aws.sqs-arn")
   lazy val httpClient: SdkAsyncHttpClient =
     AkkaHttpClient
       .builder()

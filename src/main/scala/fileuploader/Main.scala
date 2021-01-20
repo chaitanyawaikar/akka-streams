@@ -10,7 +10,7 @@ object Main extends App {
 
   private lazy val snsPublisher = new SNSClient()
   private lazy val sqsClient = new SqsClient(
-    sqsTopicArn = sqsTopicArn,
+    sqsTopicUrl = sqsTopicUrl,
     httpClient = httpClient,
     credentialsProvider = credentialsProvider,
     overrideConfig = overrideConfig

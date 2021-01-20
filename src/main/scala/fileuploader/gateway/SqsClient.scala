@@ -20,7 +20,7 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-class SqsClient(sqsTopicArn: String,
+class SqsClient(sqsTopicUrl: String,
                 httpClient: SdkAsyncHttpClient,
                 credentialsProvider: StaticCredentialsProvider,
                 overrideConfig: ClientOverrideConfiguration)(implicit actorSystem: ActorSystem) {
@@ -50,7 +50,7 @@ class SqsClient(sqsTopicArn: String,
       .withMaxBufferSize(150)
       .withMaxBatchSize(10)
     val sqsSource = SqsSource(
-      sqsTopicArn,
+      sqsTopicUrl,
       sourceSettings
     ).withAttributes(ActorAttributes.supervisionStrategy(supervisionStrategy))
 
