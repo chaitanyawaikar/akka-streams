@@ -8,10 +8,6 @@ import akka.stream.scaladsl.{Flow, RestartSource, Sink, Source}
 import akka.stream.{ActorAttributes, Supervision}
 import fileuploader.models.Event
 import play.api.libs.json.Json
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider
-import software.amazon.awssdk.core.client.config.ClientOverrideConfiguration
-import software.amazon.awssdk.http.async.SdkAsyncHttpClient
-import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.sqs.SqsAsyncClient
 import software.amazon.awssdk.services.sqs.model.Message
 
@@ -20,19 +16,8 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-class SqsClient(sqsTopicUrl: String,
-                httpClient: SdkAsyncHttpClient,
-                credentialsProvider: StaticCredentialsProvider,
-                overrideConfig: ClientOverrideConfiguration)(implicit actorSystem: ActorSystem) {
-
-  implicit val sqsClient: SqsAsyncClient =
-    SqsAsyncClient
-      .builder()
-      .credentialsProvider(credentialsProvider)
-      .region(Region.EU_CENTRAL_1)
-      .httpClient(httpClient)
-      .overrideConfiguration(overrideConfig)
-      .build()
+class SqsClient(sqsTopicUrl: String)(implicit sqsClient: SqsAsyncClient,
+                                     actorSystem: ActorSystem) {
 
   def pollMessages(): Future[Unit] = {
     for {
